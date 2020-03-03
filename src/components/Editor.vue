@@ -1,9 +1,16 @@
 <template>
   <div>
-    <h1 class="subtitle">Entrada</h1>
+    <h1 class="subtitle">
+      Entrada
+      <b-field id="lang">
+        <b-select v-model="lang" @change.native="$emit('lang')" placeholder="Seleccione">
+          <option v-for="lang in langs" :value="lang.code" :key="lang.code">{{ lang.name }}</option>
+        </b-select>
+      </b-field>
+    </h1>
     <div class="card">
       <div class="items-container">
-        <div v-for="(item, index) in items" :key="index">
+        <transition-group name="fade" tag="div" v-for="(item, i) in items" :key="i">
           <div class="columns is-vcentered">
             <div class="column">
               <b-tag>{{ index + 1 }}</b-tag>
@@ -15,10 +22,12 @@
               <b-button @click="removeItem(index)" size="is-small" type="is-danger" outlined>X</b-button>
             </div>
           </div>
-        </div>
-        <div v-show="items.length === 0" class="has-text-centered is-italic">
-          <h1 class="subtitle">Su codigo magico aperecera justo aquí!</h1>
-        </div>
+        </transition-group>
+        <transition>
+          <div v-show="items.length === 0" class="has-text-centered is-italic">
+            <h1 class="subtitle">Su codigo magico aperecera justo aquí!</h1>
+          </div>
+        </transition>
       </div>
       <hr />
       <b-field>
@@ -53,40 +62,57 @@ export default {
   },
   props: {
     value: {
-      type: String,
+      type: Object,
       required: false,
-      default: ""
+      default: () => {}
     }
   },
   data() {
     return {
+      langs: [
+        {
+          name: "Python",
+          code: "python"
+        },
+        {
+          name: "C++",
+          code: "cplusplus"
+        },
+        {
+          name: "ULA",
+          code: "ula"
+        },
+        {
+          name: "Javascript/node",
+          code: "node"
+        }
+      ],
+      lang: "ula",
       items: [],
       code: ""
     };
   },
   watch: {
     value(newVal) {
-      if (newVal === "") this.items = [];
+      if (!newVal.codes) this.items = [];
     }
   },
   methods: {
-    scrollToBottom() {
-      const items = document.querySelector(".items-container");
-      items.scrollTop = items.scrollHeight;
-    },
     add() {
       if (this.code === "") return;
       this.items.push(this.code.trim());
       this.emitCodes();
-      this.scrollToBottom();
       this.code = "";
     },
     emitCodes() {
-      this.$emit("input", this.items.customToString());
+      this.$emit("input", {
+        codes: this.items.customToString(),
+        lang: this.lang
+      });
     },
     addItems() {
-      if (!this.value) return;
-      this.items = this.value.split("\n");
+      if (!this.value.codes) return;
+      this.items = this.value.codes.split("\n");
     },
     removeItem(index) {
       this.items.splice(index, 1);
@@ -109,5 +135,18 @@ pre[class*="language-"] {
   height: 215px;
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+#lang {
+  float: right;
 }
 </style>

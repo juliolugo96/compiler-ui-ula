@@ -14,6 +14,12 @@ yarn-error.log*
 # Editor directories and files
 .idea
 .vscode
+a.out
+fileSource.cpp
+fileSource.js
+fileSource.ula
+fileSource.py
+
 *.suo
 *.ntvs*
 *.njsproj

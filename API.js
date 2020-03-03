@@ -10,11 +10,23 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const SOURCE_FILE_NAME = "fileSource.py";
+const SOURCE_FILES = {
+    cplusplus: "fileSource.cpp",
+    python: "fileSource.py",
+    node: "fileSource.js",
+    ula: "fileSource.ula"
+}
 
-async function runFile() {
+const COMMANDS = {
+    cplusplus: `g++ ${SOURCE_FILES.cplusplus} && ./a.out`,
+    python: `python ${SOURCE_FILES.python}`,
+    node: `node ${SOURCE_FILES.node}`,
+    ula: `ula ${SOURCE_FILES.ula}`
+}
+
+async function runFile({ lang }) {
     try {
-        const command = `python ${SOURCE_FILE_NAME}`
+        const command = COMMANDS[lang];
         var { stdout } = await exec(command);
         return stdout;
     } catch ({ stderr }) {
@@ -22,9 +34,9 @@ async function runFile() {
     }
 }
 
-function saveFile(data) {
+function saveFile({ lang, codes }) {
     return new Promise((resolve, reject) => {
-        fs.writeFile(`${SOURCE_FILE_NAME}`, data, function (err) {
+        fs.writeFile(SOURCE_FILES[lang], codes, function (err) {
             if (err) reject(err)
             else resolve()
         });
@@ -32,8 +44,8 @@ function saveFile(data) {
 }
 
 app.post('/', async function (req, res) {
-    await saveFile(req.body.codes);
-    const result = await runFile();
+    await saveFile(req.body);
+    const result = await runFile(req.body);
     res.send({ result });
 });
 
