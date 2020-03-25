@@ -1,5 +1,5 @@
 # Compiler-UI
-## Interfaz para correr lenguajes
+## Interfaz para ejecutar lenguajes
 
 Se admite soporte para:
 * C++
