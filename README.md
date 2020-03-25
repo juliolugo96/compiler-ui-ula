@@ -1,4 +1,4 @@
-# compiler-ui
+# Compiler-UI
 ## Interfaz para correr lenguajes
 
 Se admite soporte para:
